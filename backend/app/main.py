@@ -12,6 +12,9 @@ from app.api import health, auth, resources, ratings, recommendations, team_favo
 from app.api.deps import get_current_user
 from app.api.endpoints import auth as auth_endpoints, mentors, technologies, teams, skill_levels
 
+import os
+import json
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -26,10 +29,17 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+origins_str = os.getenv("BACKEND_CORS_ORIGINS", '["http://localhost:5173"]')
+
+try:
+    origins = json.loads(origins_str)
+except json.JSONDecodeError:
+    origins = [origins_str] if origins_str else []
+
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_methods=["*"],
     allow_headers=["*"],
 )
