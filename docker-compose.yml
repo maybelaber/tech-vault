@@ -1,0 +1,61 @@
+# TechVault — Corporate Knowledge Sharing Platform (TMA)
+# Monorepo: backend (FastAPI), frontend (Vite+React), PostgreSQL
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: techvault-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-techvault}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-techvault_secret}
+      POSTGRES_DB: ${POSTGRES_DB:-techvault}
+    ports:
+      - '${POSTGRES_PORT:-5432}:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'pg_isready -U ${POSTGRES_USER:-techvault} -d ${POSTGRES_DB:-techvault}',
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: techvault-backend
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-techvault}:${POSTGRES_PASSWORD:-techvault_secret}@postgres:5432/${POSTGRES_DB:-techvault}
+    ports:
+      - '${BACKEND_PORT:-8000}:8000'
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
+    volumes:
+      - ./backend:/app
+      - ./backend/demo:/app/demo
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: techvault-frontend
+    environment:
+      CHOKIDAR_USEPOLLING: "true"
+    ports:
+      - '3000:3000'
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+
+volumes:
+  postgres_data:

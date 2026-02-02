@@ -1,0 +1,14 @@
+# TechVault Backend — Python 3.12
+fastapi>=0.115.0,<1
+uvicorn[standard]>=0.32.0
+pydantic>=2.10.0
+pydantic-settings>=2.6.0
+
+# DB
+sqlalchemy[asyncio]>=2.0.36
+asyncpg>=0.30.0
+alembic>=1.14.0
+
+# Auth
+python-jose[cryptography]>=3.3.0
+python-multipart>=0.0.12
