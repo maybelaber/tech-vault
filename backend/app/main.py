@@ -31,10 +31,12 @@ app = FastAPI(
 
 origins_str = os.getenv("BACKEND_CORS_ORIGINS", '["http://localhost:5173"]')
 
-try:
-    origins = json.loads(origins_str)
-except json.JSONDecodeError:
-    origins = [origins_str] if origins_str else []
+origins_raw = os.getenv("BACKEND_CORS_ORIGINS", "")
+origins = [origin.strip() for origin in origins_raw.split(",") if origin]
+
+if not origins:
+    origins = ["http://localhost:3000"]
+
 
 app.add_middleware(
     CORSMiddleware,
