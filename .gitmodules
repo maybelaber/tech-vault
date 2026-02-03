@@ -1,0 +1,6 @@
+[submodule "backend/telegram-support-bot"]
+	path = backend/telegram-support-bot
+	url = https://github.com/maybelaber/telegram-support-bot.git
+[submodule "backend/telegram_support_bot"]
+	path = backend/telegram_support_bot
+	url = https://github.com/maybelaber/telegram-support-bot.git
