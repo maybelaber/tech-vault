@@ -3,9 +3,9 @@
 
 import os
 
-# demo/ relative to backend root (parent of scripts/)
+# backend/static/demo — same path used by main.py for StaticFiles mount at /demo
 BACKEND_ROOT = os.path.join(os.path.dirname(__file__), "..")
-DEMO_DIR = os.path.join(BACKEND_ROOT, "demo")
+DEMO_DIR = os.path.join(BACKEND_ROOT, "static", "demo")
 
 FILES = {
     "design_tokens.md": """# Design Tokens in Figma
@@ -105,6 +105,9 @@ export function Button({ label, onClick, disabled = false }: ButtonProps) {
 
 Enable `strict: true` in `tsconfig.json` for safer code.
 """,
+    # Alias for DB paths that use + (e.g. /demo/react_+_typescript_setup.md)
+    # same content as react_typescript_setup.md, filled below
+    "react_+_typescript_setup.md": None,
     "figma_components.md": """# Figma Components
 
 Build reusable UI in Figma with variants and auto-layout.
@@ -175,12 +178,18 @@ const onSave = useCallback(() => save(data), [data])
 
 def main() -> None:
     os.makedirs(DEMO_DIR, exist_ok=True)
+    # Resolve alias: react_+_typescript_setup.md uses same content as react_typescript_setup.md
+    if FILES.get("react_+_typescript_setup.md") is None:
+        FILES["react_+_typescript_setup.md"] = FILES["react_typescript_setup.md"]
     for filename, content in FILES.items():
+        if content is None:
+            continue
         path = os.path.join(DEMO_DIR, filename)
         with open(path, "w", encoding="utf-8") as f:
             f.write(content)
         print(f"Created {path}")
-    print(f"Done. {len(FILES)} files in {DEMO_DIR}")
+    print(
+        f"Done. {len([c for c in FILES.values() if c is not None])} files in {DEMO_DIR}")
 
 
 if __name__ == "__main__":

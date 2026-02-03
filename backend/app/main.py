@@ -71,10 +71,11 @@ app.include_router(
     profile.router, prefix="/api", dependencies=[Depends(get_current_user)]
 )
 
-# Serve static demo files (e.g. /demo/figma_components.md)
-_demo_dir = Path(__file__).resolve().parent.parent / "demo"
-_demo_dir.mkdir(exist_ok=True)
-app.mount("/demo", StaticFiles(directory=str(_demo_dir)), name="demo")
+# Serve static demo files from backend/static/demo at /demo (works locally and in Docker)
+_base_dir = Path(__file__).resolve().parent.parent
+_static_demo_dir = _base_dir / "static" / "demo"
+_static_demo_dir.mkdir(parents=True, exist_ok=True)
+app.mount("/demo", StaticFiles(directory=str(_static_demo_dir)), name="demo")
 
 
 @app.get("/")
